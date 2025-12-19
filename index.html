@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>ONE PIECE 4つの漢字モード</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+body {
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    background: #0b1220;
+    color: #e6eef6;
+    padding: 20px;
+}
+.container {
+    max-width: 900px;
+    margin: 0 auto;
+    background: #0f1724;
+    padding: 18px;
+    border-radius: 10px;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.6);
+}
+h1 { margin-top: 0; font-size: 22px; }
+.kanji-box {
+    font-size: 40px;
+    background: #071021;
+    padding: 16px;
+    text-align: center;
+    letter-spacing: 14px;
+    border-radius: 8px;
+    margin: 20px 0;
+}
+button {
+    padding: 10px 14px;
+    border: none;
+    border-radius: 6px;
+    background: #2b8bd6;
+    color: white;
+    cursor: pointer;
+    margin-right: 6px;
+}
+#result {
+    background: #071828;
+    margin-top: 15px;
+    padding: 15px;
+    border-radius: 8px;
+}
+input, select {
+    padding: 8px;
+    border-radius: 6px;
+    border: 1px solid #274b67;
+    background: #071826;
+    color: #e6eef6;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+<h1>ONE PIECE — 4つの漢字モード</h1>
+
+<button onclick="newQuestion()">新しい問題</button>
+<button onclick="showAnswer()">正解を見る</button>
+
+<div class="kanji-box" id="kanjiBox">— — — —</div>
+
+<input id="answerInput" placeholder="キャラ名を入力してEnterで回答">
+<select id="candidateSelect" size="6" style="width:100%; max-width:600px; margin-top:10px;"></select>
+
+<div id="result"></div>
+</div>
+
+<script>
+// =====================
+// waza01.txt を読み込み → DATA / ALIAS を生成
+// =====================
+
+let DATA = {};
+let ALIAS = {};
+
+async function loadData() {
+    const text = await fetch("waza01.txt").then(r => r.text());
+    parseText(text);
+    populateCandidates();
+    newQuestion();
+}
+
+// =====================
+// テキスト解析処理
+// =====================
+function parseText(raw) {
+    DATA = {};
+    ALIAS = {};
+
+    const lines = raw.split(/\r?\n/);
+    let current = null;
+
+    for (let line of lines) {
+        line = line.trim();
+        if (!line) continue;
+
+        // 《枠》 → キャラリセット（無視）
+        if (line.startsWith("《") && line.includes("》")) {
+            current = null;
+            continue;
+        }
+
+        // 【キャラ名】
+        const m = line.match(/^【([^】]+)】/);
+        if (m) {
+            let nameBlock = m[1];
+
+            // (: ) 内の別名
+            let alt = null;
+            const altM = nameBlock.match(/(.+)\s*\(:\s*([^()]+)\s*\)$/);
+            let main;
+
+            if (altM) {
+                main = altM[1].trim();
+                alt = altM[2].trim();
+                ALIAS[main] = [alt];
+            } else {
+                main = nameBlock.trim();
+                ALIAS[main] = [];
+            }
+
+            // 最後の「・」以降も別名
+            if (main.includes("・")) {
+                ALIAS[main].push(main.split("・").pop());
+            }
+
+            // キャラ登録
+            if (!DATA[main]) DATA[main] = [];
+
+            current = main;
+
+            // 誤って続きを技として解析しない
+            line = line.slice(m[0].length).trim();
+            if (!line) continue;
+        }
+
+        if (!current) continue;
+
+        // ● の技だけ使う（○は無視）
+        const techM = line.match(/^●\s*(.+)/);
+        if (!techM) continue;
+
+        let tech = techM[1];
+        tech = tech.replace(/\(.*?\)/g, ""); // () は削除
+        tech = tech.trim();
+
+        if (tech) {
+            const kanji = tech.match(/[一-龥]/g) || [];
+            DATA[current].push({ name: tech, kanji });
+        }
+    }
+
+    // 漢字を1つも持たないキャラは除外
+    for (const ch of Object.keys(DATA)) {
+        if (!DATA[ch].some(t => t.kanji.length > 0)) {
+            delete DATA[ch];
+            delete ALIAS[ch];
+        }
+    }
+}
+
+// =====================
+// UI 系処理
+// =====================
+function sample(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+function shuffle(arr){ for(let i=arr.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]];} return arr; }
+
+let current = null;
+
+function populateCandidates() {
+    const sel = document.getElementById("candidateSelect");
+    sel.innerHTML = "";
+    Object.keys(DATA).sort().forEach(ch=>{
+        const op = document.createElement("option");
+        op.value = ch;
+        op.textContent = ch;
+        sel.appendChild(op);
+    });
+}
+
+// -----------------------
+// 問題生成
+// -----------------------
+function newQuestion(){
+    const chars = Object.keys(DATA);
+
+    for (let tries=0; tries<300; tries++){
+        const ch = sample(chars);
+        const techs = DATA[ch].filter(t => t.kanji.length > 0);
+        if (techs.length < 4) continue;
+
+        shuffle(techs);
+        const chosen = techs.slice(0,4);
+        const kanji = chosen.map(t => sample(t.kanji));
+
+        // 重複禁止
+        if (new Set(kanji).size < 4) continue;
+
+        current = { ch, chosen, kanji: shuffle([...kanji]) };
+        document.getElementById("kanjiBox").textContent = current.kanji.join(" ");
+        document.getElementById("result").textContent = "";
+        return;
+    }
+
+    document.getElementById("kanjiBox").textContent = "生成失敗";
+}
+
+// -----------------------
+// 回答チェック
+// -----------------------
+function checkAnswer(ans){
+    if (!current) return;
+
+    const corr = current.ch;
+    const als = ALIAS[corr] || [];
+
+    let ok = false;
+    if (ans === corr) ok = true;
+    if (als.includes(ans)) ok = true;
+
+    const r = document.getElementById("result");
+    if (ok){
+        r.innerHTML = "<strong style='color:#b7f5c7'>正解！</strong><br>キャラ：" + corr;
+    } else {
+        r.innerHTML = "<strong style='color:#ffbdbd'>不正解</strong><br>あなた：" 
+                       + ans + "<br>正解：" + corr;
+    }
+
+    r.innerHTML += "<br><br><strong>使用技：</strong><ul>" +
+        current.chosen.map(t => "<li>" + t.name + "（" + t.kanji.join("") + "）</li>").join("")
+        + "</ul>";
+}
+
+function showAnswer(){
+    if (!current) return;
+    checkAnswer("（無回答）");
+}
+
+document.getElementById("answerInput").addEventListener("keydown", e=>{
+    if(e.key === "Enter"){
+        checkAnswer(e.target.value.trim());
+    }
+});
+document.getElementById("candidateSelect").addEventListener("change", e=>{
+    checkAnswer(e.target.value);
+});
+
+// 最初の読み込み
+loadData();
+</script>
+
+</body>
+</html>
