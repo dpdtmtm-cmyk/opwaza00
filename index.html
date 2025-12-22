@@ -21,14 +21,23 @@ body {
 }
 h1 { margin-top: 0; font-size: 22px; }
 .kanji-box {
-    font-size: 40px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px 40px;          /* 縦 横 */
+    justify-items: center;
+
+    font-size: 48px;
     background: #071021;
-    padding: 16px;
-    text-align: center;
-    letter-spacing: 14px;
+    padding: 20px;
     border-radius: 8px;
     margin: 20px 0;
+
+    letter-spacing: 0;      /* 横並び用なので無効化 */
 }
+.kanji-box span {
+    display: inline-block;
+}
+
 button {
     padding: 10px 14px;
     border: none;
@@ -255,3 +264,4 @@ loadData();
 
 </body>
 </html>
+
