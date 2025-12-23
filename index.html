@@ -42,17 +42,28 @@ h1 { margin-top: 0; font-size: 22px; }
 }
 @media (max-width: 600px) {
     .kanji-box {
-        aspect-ratio: 1 / 1;        /* 正方形にする */
+        /* 正方形だがデカすぎない */
+        aspect-ratio: 1 / 1;
         width: 100%;
-        max-width: 90vw;            /* 画面幅に収める */
+        max-width: 320px;        /* ← デカさの元凶を止める */
         margin: 12px auto;
 
-        font-size: 50px;            /* 正方形内で大きく */
-        gap: 18px 48px;             /* 横を広めにしてワイド感 */
+        /* グリッドを左右に張る */
+        grid-template-columns: 1fr 1fr;
+        justify-items: stretch; /* ← 重要 */
+        align-items: center;
 
-        padding: 12px;
-        align-content: center;      /* グリッド全体を中央寄せ */
-        justify-items: center;
+        font-size: 52px;
+        line-height: 1;
+
+        gap: 20px 0;             /* 横gapを消して“張り”を出す */
+        padding: 14px 18px;
+    }
+
+    .kanji-box span {
+        display: block;
+        text-align: center;
+        width: 100%;             /* ← 各マスを最大幅に */
     }
 }
 
@@ -283,6 +294,7 @@ loadData();
 
 </body>
 </html>
+
 
 
 
