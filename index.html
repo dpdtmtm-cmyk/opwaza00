@@ -142,7 +142,7 @@ input, select {
 <div id="sideMenu">
   <div class="menuContent">
     <h2>情報</h2>
-    <p>バージョン：<strong>Ver 1.0.3</strong></p>
+    <p>バージョン：<strong>Ver 1.0.4</strong></p>
       
 <hr style="border:0;border-top:1px solid #274b67;margin:16px 0;">
 
@@ -276,8 +276,36 @@ function parseText(raw) {
 // =====================
 function sample(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
 function shuffle(arr){ for(let i=arr.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]];} return arr; }
+function findSameKanjiChars(targetKanji, mainChar) {
+    const result = [];
+    const targetSet = new Set(targetKanji);
+
+    for (const ch of Object.keys(DATA)) {
+        if (ch === mainChar) continue;
+
+        const kanjiSet = new Set();
+        DATA[ch].forEach(t => {
+            t.kanji.forEach(k => kanjiSet.add(k));
+        });
+
+        let ok = true;
+        for (const k of targetSet) {
+            if (!kanjiSet.has(k)) {
+                ok = false;
+                break;
+            }
+        }
+
+        if (ok) result.push(ch);
+    }
+    return result;
+}
 
 let current = null;
+let extraAnswers = [];
+    
+let current = null;
+let extraAnswers = []; // ★ 同一4漢字キャラ用
 
 function populateCandidates() {
     const sel = document.getElementById("candidateSelect");
@@ -317,7 +345,13 @@ function newQuestion(){
         // 重複禁止
         if (new Set(kanji).size < 4) continue;
 
-        current = { ch, chosen, kanji: shuffle([...kanji]) };
+        const shuffledKanji = shuffle([...kanji]);
+
+current = { ch, chosen, kanji: shuffledKanji };
+
+// ★ 同一4漢字キャラ探索
+extraAnswers = findSameKanjiChars(shuffledKanji, ch);
+
        const box = document.getElementById("kanjiBox");
 box.innerHTML = "";
 current.kanji.forEach(k => {
@@ -345,10 +379,17 @@ function checkAnswer(ans){
     let ok = false;
     if (ans === corr) ok = true;
     if (als.includes(ans)) ok = true;
+    if (extraAnswers.includes(ans)) ok = true; // ★ 追加
 
     const r = document.getElementById("result");
     if (ok){
-        r.innerHTML = "<strong style='color:#b7f5c7'>正解！</strong><br>キャラ：" + corr;
+      r.innerHTML = "<strong style='color:#b7f5c7'>正解！</strong><br>キャラ：" + corr;
+
+if (extraAnswers.length > 0) {
+    r.innerHTML += "<br><span style='color:#cfe4ff'>同一漢字キャラ：</span>"
+        + extraAnswers.join("、");
+}
+
     } else {
         r.innerHTML = "<strong style='color:#ffbdbd'>不正解</strong><br>あなた：" 
                        + ans + "<br>正解：" + corr;
@@ -393,6 +434,7 @@ loadData();
 
 </body>
 </html>
+
 
 
 
