@@ -177,7 +177,7 @@ body.light .menuContent p {
   <div class="menuContent">
     <h2>情報</h2>
     <p>バージョン：<strong>Ver 1.0.42</strong></p>
- <button onclick="toggleLightMode()"
+<button id="themeToggle"
   style="
     margin-top:12px;
     width:100%;
@@ -188,8 +188,9 @@ body.light .menuContent p {
     border:none;
     cursor:pointer;
   ">
-  🌗 ライト / ダーク切替
+  🌞 ライトモード
 </button>
+
      
 <hr style="border:0;border-top:1px solid #274b67;margin:16px 0;">
 
@@ -487,30 +488,28 @@ menuBtn.addEventListener("click", () => {
 // =====================
 const themeBtn = document.getElementById("themeToggle");
 
-// 初期状態の復元
 const savedTheme = localStorage.getItem("theme");
 if (savedTheme === "light") {
     document.body.classList.add("light");
     themeBtn.textContent = "🌙 ダークモード";
+} else {
+    themeBtn.textContent = "🌞 ライトモード";
 }
 
 themeBtn.addEventListener("click", () => {
     const isLight = document.body.classList.toggle("light");
 
-    if (isLight) {
-        localStorage.setItem("theme", "light");
-        themeBtn.textContent = "🌙 ダークモード";
-    } else {
-        localStorage.setItem("theme", "dark");
-        themeBtn.textContent = "🌞 ライトモード";
-    }
+    localStorage.setItem("theme", isLight ? "light" : "dark");
+    themeBtn.textContent = isLight ? "🌙 ダークモード" : "🌞 ライトモード";
 });
+
 
 loadData();
 </script>
 
 </body>
 </html>
+
 
 
 
