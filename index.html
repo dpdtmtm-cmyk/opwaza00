@@ -142,7 +142,7 @@ input, select {
 <div id="sideMenu">
   <div class="menuContent">
     <h2>情報</h2>
-    <p>バージョン：<strong>Ver 1.0.1</strong></p>
+    <p>バージョン：<strong>Ver 1.0.2</strong></p>
   </div>
 </div>
 
@@ -265,12 +265,21 @@ let current = null;
 function populateCandidates() {
     const sel = document.getElementById("candidateSelect");
     sel.innerHTML = "";
+
+    // 無選択状態
+    const none = document.createElement("option");
+    none.value = "";
+    none.textContent = "---（無選択）---";
+    sel.appendChild(none);
+
     Object.keys(DATA).sort().forEach(ch=>{
         const op = document.createElement("option");
         op.value = ch;
         op.textContent = ch;
         sel.appendChild(op);
     });
+
+    sel.value = ""; // 初期状態を無選択に
 }
 
 // -----------------------
@@ -325,6 +334,10 @@ function checkAnswer(ans){
         current.chosen.map(t => "<li>" + t.name + "（" + t.kanji.join("") + "）</li>").join("")
         + "</ul>";
 }
+    // 回答後に入力をリセット
+    document.getElementById("answerInput").value = "";
+    document.getElementById("candidateSelect").value = "";
+}
 
 function showAnswer(){
     if (!current) return;
@@ -337,8 +350,10 @@ document.getElementById("answerInput").addEventListener("keydown", e=>{
     }
 });
 document.getElementById("candidateSelect").addEventListener("change", e=>{
+    if (e.target.value === "") return; // 無選択は無視
     checkAnswer(e.target.value);
 });
+
 
 // 最初の読み込み
 // ハンバーガーメニュー制御
@@ -354,6 +369,7 @@ loadData();
 
 </body>
 </html>
+
 
 
 
