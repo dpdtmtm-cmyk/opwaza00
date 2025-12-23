@@ -176,7 +176,7 @@ body.light .menuContent p {
 <div id="sideMenu">
   <div class="menuContent">
     <h2>情報</h2>
-    <p>バージョン：<strong>Ver 1.0.42</strong></p>
+    <p>バージョン：<strong>Ver 1.0.43</strong></p>
 <button id="themeToggle"
   style="
     margin-top:12px;
@@ -453,6 +453,21 @@ if (extraAnswers.length > 0) {
     r.innerHTML += "<br><br><strong>使用技：</strong><ul>" +
         current.chosen.map(t => "<li>" + t.name + "（" + t.kanji.join("") + "）</li>").join("")
         + "</ul>";
+// ★ 追加：下部にも新しい問題ボタン
+r.innerHTML += `
+<br>
+<button onclick="newQuestion()" style="
+  margin-top:10px;
+  padding:10px 14px;
+  border:none;
+  border-radius:6px;
+  background:#2b8bd6;
+  color:white;
+  cursor:pointer;
+">
+  新しい問題
+</button>
+`;
 
     // ✅ 回答後に入力をリセット（関数内に入れる）
     document.getElementById("answerInput").value = "";
@@ -509,6 +524,7 @@ loadData();
 
 </body>
 </html>
+
 
 
 
