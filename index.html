@@ -176,7 +176,7 @@ body.light .menuContent p {
 <div id="sideMenu">
   <div class="menuContent">
     <h2>情報</h2>
-    <p>バージョン：<strong>Ver 1.0.50</strong></p>
+    <p>バージョン：<strong>Ver 1.0.51</strong></p>
 <button id="themeToggle"
   style="
     margin-top:12px;
@@ -567,33 +567,45 @@ function searchKanji() {
     }
 
     const targets = input.split(",").map(k => k.trim());
-    const hits = [];
+    const results = [];
 
     for (const ch of Object.keys(DATA)) {
-        for (const t of DATA[ch]) {
-            const ok = targets.every(k => t.kanji.includes(k));
-            if (ok) {
-                hits.push({ chara: ch, tech: t.name });
+        const charHits = [];
+
+        for (const k of targets) {
+            const tech = DATA[ch].find(t => t.kanji.includes(k));
+            if (!tech) {
+                charHits.length = 0;
+                break; // このキャラは条件未達
             }
+            charHits.push({ kanji: k, tech: tech.name });
+        }
+
+        if (charHits.length === targets.length) {
+            results.push({ chara: ch, techs: charHits });
         }
     }
 
-    if (hits.length === 0) {
+    if (results.length === 0) {
         resultDiv.textContent = "該当なし";
         return;
     }
 
     resultDiv.innerHTML =
-        "<ul>" +
-        hits.map(h => `<li>${h.chara} ： ${h.tech}</li>`).join("") +
-        "</ul>";
+        results.map(r =>
+            `<strong>${r.chara}</strong><ul>` +
+            r.techs.map(t => `<li>${t.kanji}：${t.tech}</li>`).join("") +
+            `</ul>`
+        ).join("");
 }
+
 
 loadData();
 </script>
 
 </body>
 </html>
+
 
 
 
