@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <title>ONE PIECE 4つの漢字モード</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
+    
 <style>
 body {
     font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -132,6 +133,39 @@ input, select {
     font-size: 14px;
     color: #cfe4ff;
 }
+/* ===== ライトモード ===== */
+body.light {
+    background: #f5f7fb;
+    color: #0b1220;
+}
+
+body.light .container {
+    background: #ffffff;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.15);
+}
+
+body.light .kanji-box {
+    background: #eef2f8;
+}
+
+body.light input,
+body.light select {
+    background: #ffffff;
+    color: #0b1220;
+    border-color: #c5d3e3;
+}
+
+body.light #result {
+    background: #eef2f8;
+}
+
+body.light #sideMenu {
+    background: #ffffff;
+}
+
+body.light .menuContent p {
+    color: #334155;
+}
     
 </style>
 </head>
@@ -142,8 +176,21 @@ input, select {
 <div id="sideMenu">
   <div class="menuContent">
     <h2>情報</h2>
-    <p>バージョン：<strong>Ver 1.0.41</strong></p>
-      
+    <p>バージョン：<strong>Ver 1.0.42</strong></p>
+ <button onclick="toggleLightMode()"
+  style="
+    margin-top:12px;
+    width:100%;
+    padding:10px 12px;
+    border-radius:6px;
+    background:#2b8bd6;
+    color:white;
+    border:none;
+    cursor:pointer;
+  ">
+  🌗 ライト / ダーク切替
+</button>
+     
 <hr style="border:0;border-top:1px solid #274b67;margin:16px 0;">
 
     <a href="https://x.com/sa_sisusesaw?s=21"
@@ -435,12 +482,36 @@ const sideMenu = document.getElementById("sideMenu");
 menuBtn.addEventListener("click", () => {
     sideMenu.classList.toggle("open");
 });
+// =====================
+// テーマ切替（保存あり）
+// =====================
+const themeBtn = document.getElementById("themeToggle");
+
+// 初期状態の復元
+const savedTheme = localStorage.getItem("theme");
+if (savedTheme === "light") {
+    document.body.classList.add("light");
+    themeBtn.textContent = "🌙 ダークモード";
+}
+
+themeBtn.addEventListener("click", () => {
+    const isLight = document.body.classList.toggle("light");
+
+    if (isLight) {
+        localStorage.setItem("theme", "light");
+        themeBtn.textContent = "🌙 ダークモード";
+    } else {
+        localStorage.setItem("theme", "dark");
+        themeBtn.textContent = "🌞 ライトモード";
+    }
+});
 
 loadData();
 </script>
 
 </body>
 </html>
+
 
 
 
