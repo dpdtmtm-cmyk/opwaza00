@@ -176,7 +176,7 @@ body.light .menuContent p {
 <div id="sideMenu">
   <div class="menuContent">
     <h2>情報</h2>
-    <p>バージョン：<strong>Ver 1.0.43</strong></p>
+    <p>バージョン：<strong>Ver 1.0.50</strong></p>
 <button id="themeToggle"
   style="
     margin-top:12px;
@@ -208,6 +208,20 @@ body.light .menuContent p {
        ">
       🐞 バグ報告・お問い合わせ
     </a>
+<button onclick="openDevPage()"
+  style="
+    margin-top:12px;
+    width:100%;
+    padding:10px 12px;
+    border-radius:6px;
+    background:#475569;
+    color:white;
+    border:none;
+    cursor:pointer;
+  ">
+  🛠 開発者ページ
+</button>
+
   </div>
 </div>
 
@@ -220,6 +234,20 @@ body.light .menuContent p {
 <div class="kanji-box" id="kanjiBox">— — — —</div>
 <div id="warning" style="display:none; margin-top:6px; color:#ffd36a; font-size:14px;">
 ⚠ 同一漢字キャラあり
+</div>
+<div id="devPage" style="display:none; margin:20px auto; max-width:900px;">
+  <h2>開発者ページ</h2>
+
+  <input id="kanjiSearch"
+    placeholder="漢字を入力（例：雷 / 雷,炎）"
+    style="width:100%; max-width:400px;"
+  >
+
+  <button onclick="searchKanji()" style="margin-left:6px;">
+    検索
+  </button>
+
+  <div id="devResult" style="margin-top:15px;"></div>
 </div>
 
 <input id="answerInput" placeholder="キャラ名を入力してEnterで回答">
@@ -518,12 +546,55 @@ themeBtn.addEventListener("click", () => {
     themeBtn.textContent = isLight ? "🌙 ダークモード" : "🌞 ライトモード";
 });
 
+function openDevPage() {
+    const pass = prompt("開発者パスワードを入力");
+    if (pass !== "theoria") {
+        alert("パスワードが違います");
+        return;
+    }
+
+    document.getElementById("devPage").style.display = "block";
+    sideMenu.classList.remove("open");
+    window.scrollTo(0, document.body.scrollHeight);
+}
+function searchKanji() {
+    const input = document.getElementById("kanjiSearch").value.trim();
+    const resultDiv = document.getElementById("devResult");
+
+    if (!input) {
+        resultDiv.textContent = "漢字を入力してください";
+        return;
+    }
+
+    const targets = input.split(",").map(k => k.trim());
+    const hits = [];
+
+    for (const ch of Object.keys(DATA)) {
+        for (const t of DATA[ch]) {
+            const ok = targets.every(k => t.kanji.includes(k));
+            if (ok) {
+                hits.push({ chara: ch, tech: t.name });
+            }
+        }
+    }
+
+    if (hits.length === 0) {
+        resultDiv.textContent = "該当なし";
+        return;
+    }
+
+    resultDiv.innerHTML =
+        "<ul>" +
+        hits.map(h => `<li>${h.chara} ： ${h.tech}</li>`).join("") +
+        "</ul>";
+}
 
 loadData();
 </script>
 
 </body>
 </html>
+
 
 
 
