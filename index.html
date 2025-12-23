@@ -90,9 +90,61 @@ input, select {
     background: #071826;
     color: #e6eef6;
 }
+/* ハンバーガーメニュー */
+#menuButton {
+    position: fixed;
+    top: 14px;
+    left: 14px;
+    font-size: 26px;
+    cursor: pointer;
+    z-index: 1001;
+    user-select: none;
+}
+
+#sideMenu {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 220px;
+    height: 100%;
+    background: #071021;
+    box-shadow: 4px 0 12px rgba(0,0,0,0.6);
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
+    z-index: 1000;
+}
+
+#sideMenu.open {
+    transform: translateX(0);
+}
+
+.menuContent {
+    padding: 20px;
+}
+
+.menuContent h2 {
+    margin-top: 0;
+    font-size: 18px;
+}
+
+.menuContent p {
+    margin-top: 12px;
+    font-size: 14px;
+    color: #cfe4ff;
+}
+    
 </style>
 </head>
 <body>
+<!-- ハンバーガーメニュー -->
+<div id="menuButton">☰</div>
+
+<div id="sideMenu">
+  <div class="menuContent">
+    <h2>情報</h2>
+    <p>バージョン：<strong>Ver 1.0.1</strong></p>
+  </div>
+</div>
 
 <div class="container">
 <h1>ONE PIECE — 4つの漢字モード</h1>
@@ -289,11 +341,20 @@ document.getElementById("candidateSelect").addEventListener("change", e=>{
 });
 
 // 最初の読み込み
+// ハンバーガーメニュー制御
+const menuBtn = document.getElementById("menuButton");
+const sideMenu = document.getElementById("sideMenu");
+
+menuBtn.addEventListener("click", () => {
+    sideMenu.classList.toggle("open");
+});
+
 loadData();
 </script>
 
 </body>
 </html>
+
 
 
 
