@@ -301,7 +301,14 @@ function newQuestion(){
         if (new Set(kanji).size < 4) continue;
 
         current = { ch, chosen, kanji: shuffle([...kanji]) };
-        document.getElementById("kanjiBox").textContent = current.kanji.join(" ");
+       const box = document.getElementById("kanjiBox");
+box.innerHTML = "";
+current.kanji.forEach(k => {
+    const s = document.createElement("span");
+    s.textContent = k;
+    box.appendChild(s);
+});
+
         document.getElementById("result").textContent = "";
         return;
     }
@@ -333,8 +340,8 @@ function checkAnswer(ans){
     r.innerHTML += "<br><br><strong>使用技：</strong><ul>" +
         current.chosen.map(t => "<li>" + t.name + "（" + t.kanji.join("") + "）</li>").join("")
         + "</ul>";
-}
-    // 回答後に入力をリセット
+
+    // ✅ 回答後に入力をリセット（関数内に入れる）
     document.getElementById("answerInput").value = "";
     document.getElementById("candidateSelect").value = "";
 }
@@ -369,6 +376,7 @@ loadData();
 
 </body>
 </html>
+
 
 
 
