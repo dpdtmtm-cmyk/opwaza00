@@ -142,7 +142,7 @@ input, select {
 <div id="sideMenu">
   <div class="menuContent">
     <h2>情報</h2>
-    <p>バージョン：<strong>Ver 1.0.4</strong></p>
+    <p>バージョン：<strong>Ver 1.0.41</strong></p>
       
 <hr style="border:0;border-top:1px solid #274b67;margin:16px 0;">
 
@@ -170,6 +170,9 @@ input, select {
 <button onclick="showAnswer()">正解を見る</button>
 
 <div class="kanji-box" id="kanjiBox">— — — —</div>
+<div id="warning" style="display:none; margin-top:6px; color:#ffd36a; font-size:14px;">
+⚠ 同一漢字キャラあり
+</div>
 
 <input id="answerInput" placeholder="キャラ名を入力してEnterで回答">
 <select id="candidateSelect" size="6" style="width:100%; max-width:600px; margin-top:10px;"></select>
@@ -348,6 +351,13 @@ current = { ch, chosen, kanji: shuffledKanji };
 
 // ★ 同一4漢字キャラ探索
 extraAnswers = findSameKanjiChars(shuffledKanji, ch);
+// ⚠ 表示制御
+const warn = document.getElementById("warning");
+if (extraAnswers.length > 0) {
+    warn.style.display = "block";
+} else {
+    warn.style.display = "none";
+}
 
        const box = document.getElementById("kanjiBox");
 box.innerHTML = "";
@@ -358,6 +368,7 @@ current.kanji.forEach(k => {
 });
 
         document.getElementById("result").textContent = "";
+        document.getElementById("warning").style.display = "none";
         return;
     }
 
@@ -431,6 +442,7 @@ loadData();
 
 </body>
 </html>
+
 
 
 
